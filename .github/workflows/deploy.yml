@@ -34,14 +34,11 @@ jobs:
   
     - name: Install Ansible
       run: |
-        sudo apt-get update
-        sudo apt-get install -y ansible
+        brew update 
+        brew install ansible
 
     - name: Run Ansible playbook
       run: |
         cd ansible/lab
         ansible-playbook -i inventory.ini site.yml \
           -e "app_version=$(date +%s)" \
-          -e "target_host=${{ secrets.WEB1_HOST }}" \
-          -e "ansible_user=${{ secrets.ANSIBLE_USER }}"
-
