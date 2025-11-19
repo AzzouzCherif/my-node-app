@@ -15,7 +15,7 @@ jobs:
     - name: Checkout Ansible repo
       uses: actions/checkout@v3
       with:
-        repository: AzzouzCherif/ansible-lab
+        repository: AzzouzCherif/ansible-labs
         path: ansible
 
     - name: Prepare SSH key
