@@ -1,0 +1,40 @@
+name: Deploy Node App via Ansible
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Node.js App
+      uses: actions/checkout@v3
+
+    - name: Checkout Ansible repo
+      uses: actions/checkout@v3
+      with:
+        repository: AzzouzCherif/ansible-labs
+        path: ansible
+
+    - name: Prepare SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.ANSIBLE_SSH_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan ${{ secrets.WEB1_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Install Ansible
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ansible
+
+    - name: Run Ansible playbook
+      run: |
+        cd ansible/lab
+        ansible-playbook -i inventory.ini site.yml \
+          -e "app_version=$(date +%s)" \
+          -e "target_host=${{ secrets.WEB1_HOST }}" \
+          -e "ansible_user=${{ secrets.ANSIBLE_USER }}"
+
