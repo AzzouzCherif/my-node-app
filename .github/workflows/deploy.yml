@@ -18,13 +18,19 @@ jobs:
         repository: AzzouzCherif/ansible-labs
         path: ansible
 
-    - name: Prepare SSH key
+    - name: Setup SSH agent with key
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.ANSIBLE_SSH_KEY }}
+
+    - name: Trust web1 host key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.ANSIBLE_SSH_KEY }}" | base64 --decode > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
         ssh-keyscan ${{ secrets.WEB1_HOST }} >> ~/.ssh/known_hosts
 
+    - name: Test SSH connection
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB1_HOST }} "echo CONNECTED_OK"
   
     - name: Install Ansible
       run: |
